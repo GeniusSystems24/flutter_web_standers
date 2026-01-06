@@ -1,0 +1,54 @@
+name: flutter_web_optimized
+description: مشروع Flutter Web محسن وفق أفضل معايير الأداء
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP Client - خفيف وفعال
+  http: ^1.1.0
+
+  # State Management - اختر واحداً فقط
+  provider: ^6.1.0
+
+  # التخزين المحلي
+  shared_preferences: ^2.2.0
+
+  # الصور المحسنة
+  cached_network_image: ^3.3.0
+
+  # أيقونات SVG (بديل خفيف لـ Material Icons الكاملة)
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+  # JSON Serialization (بدلاً من reflection)
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.0
+
+flutter:
+  uses-material-design: true
+
+  # الأصول المحددة فقط (تجنب تحميل مجلدات كاملة)
+  assets:
+    - assets/images/logo.webp
+    - assets/icons/
+
+  # الخطوط المحسنة - الأوزان المستخدمة فقط
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.woff2
+          weight: 400
+        - asset: assets/fonts/Cairo-Bold.woff2
+          weight: 700

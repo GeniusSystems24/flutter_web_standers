@@ -1,0 +1,25 @@
+{
+  "name": "Flutter Web Optimized",
+  "short_name": "FlutterWeb",
+  "description": "تطبيق Flutter Web محسن وفق أفضل معايير الأداء",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#2196F3",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
