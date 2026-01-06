@@ -41,14 +41,14 @@ flutter:
 
   # الأصول المحددة فقط (تجنب تحميل مجلدات كاملة)
   assets:
-    - assets/images/logo.webp
+    - assets/images/
     - assets/icons/
 
   # الخطوط المحسنة - الأوزان المستخدمة فقط
-  fonts:
-    - family: Cairo
-      fonts:
-        - asset: assets/fonts/Cairo-Regular.woff2
-          weight: 400
-        - asset: assets/fonts/Cairo-Bold.woff2
-          weight: 700
+  # fonts:
+  #   - family: Cairo
+  #     fonts:
+  #       - asset: assets/fonts/Cairo-Regular.woff2
+  #         weight: 400
+  #       - asset: assets/fonts/Cairo-Bold.woff2
+  #         weight: 700
