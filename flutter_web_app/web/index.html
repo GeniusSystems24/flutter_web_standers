@@ -1,25 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <!--
-    ==========================================
-    معيار 1: تحسين التحميل الأولي (09-initial-load.md)
-    ==========================================
-    - Resource Hints للتحميل المسبق
-    - Critical CSS مضمن
-    - شاشة انتظار محسنة
-  -->
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Preconnect للموارد الخارجية -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Preload للموارد الحرجة -->
-  <link rel="preload" href="main.dart.js" as="script">
-  <link rel="preload" href="flutter.js" as="script">
 
   <!-- SEO و PWA -->
   <meta name="description" content="تطبيق Flutter Web محسن">
@@ -30,16 +13,10 @@
 
   <title>Flutter Web Optimized</title>
 
-  <!--
-    ==========================================
-    Critical CSS - مضمن لسرعة FCP
-    ==========================================
-  -->
   <style>
     :root {
       --primary-color: #2196F3;
       --background-color: #FAFAFA;
-      --text-color: #333333;
     }
 
     * {
@@ -50,14 +27,13 @@
 
     body {
       background-color: var(--background-color);
-      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* شاشة الانتظار المحسنة */
     .splash-screen {
       display: flex;
       flex-direction: column;
@@ -109,27 +85,11 @@
       color: #757575;
       text-align: center;
     }
-
-    /* إخفاء Flutter أثناء التحميل */
-    flutter-view {
-      opacity: 0;
-      transition: opacity 0.3s ease-in;
-    }
-
-    flutter-view.ready {
-      opacity: 1;
-    }
   </style>
 </head>
 
 <body>
-  <!--
-    ==========================================
-    شاشة الانتظار مع تقدم حقيقي
-    ==========================================
-  -->
   <div id="splash" class="splash-screen">
-    <!-- SVG مضمن للشعار (أسرع من تحميل صورة) -->
     <svg class="splash-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -148,129 +108,80 @@
     <p id="splash-status" class="splash-status">جاري تحميل التطبيق...</p>
   </div>
 
+  <script src="flutter.js" defer></script>
+
   <script>
-    // إدارة شاشة الانتظار
+    // Splash Manager
     const SplashManager = {
-      loaderBar: null,
-      statusText: null,
-      splash: null,
+      loaderBar: document.getElementById('loader-bar'),
+      statusText: document.getElementById('splash-status'),
+      splash: document.getElementById('splash'),
 
-      init() {
-        this.loaderBar = document.getElementById('loader-bar');
-        this.statusText = document.getElementById('splash-status');
-        this.splash = document.getElementById('splash');
-      },
-
-      updateProgress(percent, message) {
+      updateProgress: function(percent, message) {
         if (this.loaderBar) {
-          this.loaderBar.style.width = `${percent}%`;
+          this.loaderBar.style.width = percent + '%';
         }
         if (this.statusText && message) {
           this.statusText.textContent = message;
         }
       },
 
-      hide() {
+      hide: function() {
         if (this.splash) {
           this.splash.classList.add('fade-out');
-          setTimeout(() => {
-            this.splash.remove();
+          setTimeout(function() {
+            var s = document.getElementById('splash');
+            if (s) s.remove();
           }, 300);
-        }
-
-        const flutterView = document.querySelector('flutter-view');
-        if (flutterView) {
-          flutterView.classList.add('ready');
         }
       }
     };
 
-    SplashManager.init();
+    // اختيار المحرك الأمثل
+    function selectOptimalRenderer() {
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      var hasWeakCPU = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+      var isSlowConnection = navigator.connection &&
+                             (navigator.connection.effectiveType === '2g' ||
+                              navigator.connection.effectiveType === 'slow-2g' ||
+                              navigator.connection.effectiveType === '3g');
+
+      if (isMobile || hasWeakCPU || isSlowConnection) {
+        console.log('[Renderer] Using HTML renderer');
+        return 'html';
+      }
+
+      console.log('[Renderer] Using CanvasKit');
+      return 'canvaskit';
+    }
 
     // استقبال إشارة الجاهزية من Flutter
     window.flutterReady = function() {
       SplashManager.updateProgress(100, 'جاهز!');
-      setTimeout(() => SplashManager.hide(), 200);
+      setTimeout(function() { SplashManager.hide(); }, 200);
     };
-  </script>
 
-  <script>
-    <!--
-      ==========================================
-      معيار 1: اختيار المحرك الذكي (01-renderer-selection.md)
-      ==========================================
-      - HTML Renderer للأجهزة الضعيفة والاتصال البطيء
-      - CanvasKit للأجهزة القوية
-      - Auto كاحتياط
-    -->
-    function selectOptimalRenderer() {
-      // فحص الجهاز والاتصال
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const hasWeakCPU = navigator.hardwareConcurrency <= 2;
-      const isSlowConnection = navigator.connection &&
-                               (navigator.connection.effectiveType === '2g' ||
-                                navigator.connection.effectiveType === 'slow-2g' ||
-                                navigator.connection.effectiveType === '3g');
-
-      // فحص دعم WebGL
-      let hasGoodGPU = false;
-      try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-        if (gl) {
-          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-          if (debugInfo) {
-            const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-            // تجنب CanvasKit على GPUs الضعيفة
-            const weakGPUs = ['Intel HD Graphics', 'Mali-4', 'Adreno 3', 'SwiftShader'];
-            hasGoodGPU = !weakGPUs.some(gpu => renderer.includes(gpu));
-          }
-        }
-      } catch (e) {
-        hasGoodGPU = false;
-      }
-
-      // قرار اختيار المحرك
-      if (isMobile || hasWeakCPU || isSlowConnection || !hasGoodGPU) {
-        console.log('[Renderer] Using HTML renderer for optimal performance');
-        return 'html';
-      }
-
-      console.log('[Renderer] Using CanvasKit for rich graphics');
-      return 'canvaskit';
-    }
-  </script>
-
-  <script src="flutter.js" defer></script>
-
-  <script>
-    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
-
-    window.addEventListener('load', async function() {
+    // تهيئة Flutter باستخدام API الجديد
+    window.addEventListener('load', function() {
       SplashManager.updateProgress(10, 'جاري تهيئة Flutter...');
 
-      // تحميل Flutter مع الإعدادات المحسنة
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
+      _flutter.loader.load({
         onEntrypointLoaded: async function(engineInitializer) {
           SplashManager.updateProgress(40, 'جاري تحميل المحرك...');
 
-          const selectedRenderer = selectOptimalRenderer();
+          var renderer = selectOptimalRenderer();
 
           try {
-            const appRunner = await engineInitializer.initializeEngine({
-              renderer: selectedRenderer,
+            var appRunner = await engineInitializer.initializeEngine({
+              renderer: renderer,
             });
 
             SplashManager.updateProgress(70, 'جاري بدء التطبيق...');
             await appRunner.runApp();
             SplashManager.updateProgress(90, 'جاري التحضير النهائي...');
           } catch (e) {
-            // Fallback إلى HTML إذا فشل CanvasKit
-            console.warn('[Renderer] Falling back to HTML renderer:', e);
-            const appRunner = await engineInitializer.initializeEngine({
+            console.warn('[Renderer] Falling back to HTML:', e);
+            var appRunner = await engineInitializer.initializeEngine({
               renderer: 'html',
             });
             await appRunner.runApp();
